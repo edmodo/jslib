@@ -1,0 +1,55 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://static.adsnative.com/static/js/render.v1.js"></script>
+  <script type="text/javascript" src="https://static.adsnative.com/static/js/an-edmodo.js"></script>
+</head>
+
+<body>
+  <div class='main-column'>
+    <div id='ad-container'></div>
+  </div>
+<script>
+
+function initialize(e) {
+  var keyValues = JSON.parse(decodeURIComponent(getParameterByName('key_values')));
+  var placement_id = getParameterByName('placement_id');
+  var placement = new AdsNative(placement_id, [], keyValues);
+  var position = getParameterByName('position');
+  var mainColumn = document.getElementsByClassName('main-column')[0];
+
+  window.onresize = function() { parent.adsIFrameResized(position, mainColumn); }
+
+  placement.fetchAd(function(status, adData) {
+    if(status && adData) { // If returned a valid campaign to display
+      var didDisplay = placement.displayAd('ad-container');
+      if(!didDisplay) {
+          console.log('Ad with placement ' + placement_id + ' could not be displayed.');
+      } else {
+        AnEdmodo.initAdUnit(position, adData);
+      }
+    } else {
+      e.source.postMessage({'action': 'ads-native:no-ad', 'adPosition': position}, e.origin)
+    }
+  });
+}
+
+function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+initialize();
+</script>
+
+</body>
+</html>
+
+
+
